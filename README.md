@@ -1,0 +1,1 @@
+This repo is for me to work through the Refactoring (2e) book by Martin Fowler.
