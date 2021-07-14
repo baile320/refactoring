@@ -1,5 +1,6 @@
-let invoices = require('./invoices.json');
-let plays = require('./plays.json');
+module.exports = {
+    statement
+}
 
 function statement(invoice, plays) {
     let totalAmount = 0;
@@ -42,5 +43,3 @@ function statement(invoice, plays) {
     result += `You earned ${volumeCredits} credits\n`;
     return result;
 }
-
-console.log(statement(invoices[0], plays));
