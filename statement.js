@@ -6,19 +6,6 @@ function statement(invoice, plays) {
     function playFor(aPerformance) {
         return plays[aPerformance.playID];
     }
-    function enrichPerformance(aPerformance) {
-        const result = Object.assign({}, aPerformance);
-        result.play = playFor(aPerformance);
-        return result;
-    }
-
-    let statementData = {};
-    statementData.customer = invoice.customer;
-    statementData.performances = invoice.performances.map(enrichPerformance);
-    return renderPlainText(statementData, plays);
-}
-
-function renderPlainText(data, plays) {
     function amountFor(aPerformance) {
         let result = 0;
         switch (aPerformance.play.type) {
@@ -46,6 +33,36 @@ function renderPlainText(data, plays) {
         if ("comedy" === aPerformance.play.type) result += Math.floor(aPerformance.audience / 5);
         return result;
     }
+    function totalVolumeCredits(data) {
+        let result = 0;
+        for (let perf of data.performances) {
+            result += perf.volumeCredits;
+        }
+        return result;
+    }
+    function totalAmount(data) {
+        let result = 0;
+        for (let perf of data.performances) {
+            result += perf.amount;
+        }
+        return result;
+    }
+    function enrichPerformance(aPerformance) {
+        const result = Object.assign({}, aPerformance);
+        result.play = playFor(result);
+        result.amount = amountFor(result);
+        result.volumeCredits = volumeCreditsFor(result);
+        return result;
+    }
+    let statementData = {};
+    statementData.customer = invoice.customer;
+    statementData.performances = invoice.performances.map(enrichPerformance);
+    statementData.totalAmount = totalAmount(statementData);
+    statementData.totalVolumeCredits = totalVolumeCredits(statementData);
+    return renderPlainText(statementData, plays);
+}
+
+function renderPlainText(data, plays) {
     function usd(aNumber) {
         return new Intl.NumberFormat("en-US",
             {
@@ -53,27 +70,13 @@ function renderPlainText(data, plays) {
                 minimumFractionDigits: 2
             }).format(aNumber / 100);
     }
-    function totalVolumeCredits() {
-        let result = 0;
-        for (let perf of data.performances) {
-            result += volumeCreditsFor(perf);
-        }
-        return result;
-    }
-    function totalAmount() {
-        let result = 0;
-        for (let perf of data.performances) {
-            result += amountFor(perf);
-        }
-        return result;
-    }
 
     let result = `Statement for ${data.customer}\n\t`;
 
     for (let perf of data.performances) {
-        result += `${perf.play.name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n\t`
+        result += `${perf.play.name}: ${usd(perf.amount)} (${perf.audience} seats)\n\t`
     }
-    result += `Amount owed is ${usd(totalAmount())}\n`;
-    result += `You earned ${totalVolumeCredits()} credits\n`;
+    result += `Amount owed is ${usd(data.totalAmount)}\n`;
+    result += `You earned ${data.totalVolumeCredits} credits\n`;
     return result;
 }
