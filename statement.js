@@ -3,21 +3,22 @@ module.exports = {
 }
 
 function statement(invoice, plays) {
+    function playFor(aPerformance) {
+        return plays[aPerformance.playID];
+    }
     function enrichPerformance(aPerformance) {
         const result = Object.assign({}, aPerformance);
+        result.play = playFor(aPerformance);
         return result;
     }
 
     let statementData = {};
     statementData.customer = invoice.customer;
     statementData.performances = invoice.performances.map(enrichPerformance);
-    return renderPlainText(statementData, invoice, plays);
+    return renderPlainText(statementData, plays);
 }
 
-function renderPlainText(data, invoice, plays) {
-    function playFor(aPerformance) {
-        return plays[aPerformance.playID];
-    }
+function renderPlainText(data, plays) {
     function amountFor(aPerformance) {
         let result = 0;
         switch (playFor(aPerformance).type) {
