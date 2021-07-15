@@ -3,10 +3,18 @@ module.exports = {
 }
 
 function statement(invoice, plays) {
-    return renderPlainText(invoice, plays);
+    function enrichPerformance(aPerformance) {
+        const result = Object.assign({}, aPerformance);
+        return result;
+    }
+
+    let statementData = {};
+    statementData.customer = invoice.customer;
+    statementData.performances = invoice.performances.map(enrichPerformance);
+    return renderPlainText(statementData, invoice, plays);
 }
 
-function renderPlainText(invoice, plays) {
+function renderPlainText(data, invoice, plays) {
     function playFor(aPerformance) {
         return plays[aPerformance.playID];
     }
@@ -46,22 +54,22 @@ function renderPlainText(invoice, plays) {
     }
     function totalVolumeCredits() {
         let result = 0;
-        for (let perf of invoice.performances) {
+        for (let perf of data.performances) {
             result += volumeCreditsFor(perf);
         }
         return result;
     }
     function totalAmount() {
         let result = 0;
-        for (let perf of invoice.performances) {
+        for (let perf of data.performances) {
             result += amountFor(perf);
         }
         return result;
     }
 
-    let result = `Statement for ${invoice.customer}\n\t`;
+    let result = `Statement for ${data.customer}\n\t`;
 
-    for (let perf of invoice.performances) {
+    for (let perf of data.performances) {
         result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n\t`
     }
     result += `Amount owed is ${usd(totalAmount())}\n`;
