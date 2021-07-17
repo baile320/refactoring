@@ -24,12 +24,7 @@ function createStatementData(invoice, plays) {
                 case "tragedy":
                     throw "shouldn't get here";
                 case "comedy":
-                    result = 30000;
-                    if (this.performance.audience > 20) {
-                        result += 10000 + 500 * (this.performance.audience - 20);
-                    }
-                    result += 300 * this.performance.audience;
-                    break;
+                    throw "shouldn't get here";
                 default:
                     throw new Error(`unknown type: ${perf.play.type}`);
             }
@@ -53,7 +48,14 @@ function createStatementData(invoice, plays) {
         }
     }
     class ComedyCalculator extends PerformanceCalculator {
-
+        get amount() {
+            let result = 30000;
+            if (this.performance.audience > 20) {
+                result += 10000 + 500 * (this.performance.audience - 20);
+            }
+            result += 300 * this.performance.audience;
+            return result;
+        }
     }
     function createPerformanceCalculator(aPerformance, aPlay) {
         switch (aPlay.type) {
