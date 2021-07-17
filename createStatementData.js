@@ -19,16 +19,7 @@ function createStatementData(invoice, plays) {
         }
 
         get amount() {
-            let result = 0;
-            switch (this.play.type) {
-                case "tragedy":
-                    throw "shouldn't get here";
-                case "comedy":
-                    throw "shouldn't get here";
-                default:
-                    throw new Error(`unknown type: ${perf.play.type}`);
-            }
-            return result;
+            throw new Error('subclass responsibility');
         }
 
         get volumeCredits() {
